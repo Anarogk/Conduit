@@ -1,7 +1,7 @@
 
 ## AsyncIO Streamer
 
-### Overview 
+### Description
 **AsyncIO Streamer** is a C++ application that leverages the power of Boost.Asio to establish high-performance, asynchronous TCP connections. By deftly managing data flow and employing non-blocking operations, it facilitates efficient communication with remote servers. This project serves as a robust foundation for constructing sophisticated network applications that demand rapid data exchange.
 
 ### Technologies
