@@ -19,68 +19,51 @@ const std::string http_request = "GET /index.html HTTP/1.1\r\n"
                                   "Host: example.com\r\n"
                                   "Connection: close\r\n\r\n";
 
-void GrabSomeData(asio::ip::tcp::socket& socket) {
-    std::vector<char> buffer(buffer_size);
+void GrabData(asio::ip::tcp::socket& socket, std::string& response) {
+  std::vector<char> buffer(buffer_size);
 
-    socket.async_read_some(asio::buffer(buffer),
-        [&](const asio::error_code& ec, std::size_t bytes_transferred) {
-            if (!ec) {
-                std::cout << "\n\nBytes Transferred:" << bytes_transferred << "bytes\n\n";
-                std::cout.write(buffer.data(), bytes_transferred);
-                GrabSomeData(socket);
-            } else {
-                std::cerr << "Error reading data: " << ec.message() << std::endl;
-            }
-        });
+  asio::async_read_until(socket,
+                          asio::buffer(buffer),
+                          "\r\n\r\n",
+                          [&](const asio::error_code& ec, std::size_t bytes_transferred) {
+                            if (!ec) {
+                              response.append(buffer.begin(), buffer.begin() + bytes_transferred);
+                              std::cout << "Received response: " << response << std::endl;
+                            } else {
+                              std::cerr << "Error reading response: " << ec.message() << std::endl;
+                            }
+                          });
 }
 
 int main() {
-    asio::io_context context;
-    asio::io_context::work work(context);
-    std::thread thread([&context]() { context.run(); });
+  asio::io_context context;
+  asio::io_context::work work(context);
+  std::thread thread([&context]() { context.run(); });
 
-    asio::ip::tcp::endpoint endpoint(asio::ip::make_address("xx.xx.xx.yy"), 80);
-    asio::ip::tcp::socket socket(context);
+  asio::ip::tcp::endpoint endpoint(asio::ip::make_address("xx.xx.xx.yy"), 80);
+  asio::ip::tcp::socket socket(context);
 
-    try {
-        socket.connect(endpoint);
-        std::cout << "Connected!" << std::endl;
+  try {
+    socket.connect(endpoint);
+    std::cout << "Connected!" << std::endl;
 
-        GrabSomeData(socket);
-
-        asio::error_code ec;
-        socket.write_some(asio::buffer(http_request.data(), http_request.size()), ec);
-        if (ec) {
-            std::cerr << "Error writing request: " << ec.message() << std::endl;
-        }
-
-        std::string response;
-        while (true) {
-            std::vector<char> buffer(buffer_size);
-            size_t bytes_received = 0;
-            boost::system::error_code& ec; 
-            while (socket.available() > 0) {
-                bytes_received = socket.read_some(asio::buffer(buffer), ec);
-                if (ec) {
-                    std::cerr << "Error reading response: " << ec.message() << std::endl;
-                    break;
-                }
-                response.append(buffer.begin(), buffer.begin() + bytes_received);
-            }
-
-            if (bytes_received == 0) {
-                break;
-            }
-
-            std::cout << "Received response: " << response << std::endl;
-        }
-
-        socket.shutdown(asio::ip::tcp::socket::shutdown_both);
-        socket.close();
-    } catch (const std::exception& e) {
-        std::cerr << "Exception: " << e.what() << std::endl;
+    asio::error_code ec;
+    socket.write_some(asio::buffer(http_request.data(), http_request.size()), ec);
+    if (ec) {
+      std::cerr << "Error writing request: " << ec.message() << std::endl;
+      return 1;
     }
 
-    thread.join();
-    return 0;
+    std::string response;
+    GrabData(socket, response);
+
+    socket.shutdown(asio::ip::tcp::socket::shutdown_both);
+    socket.close();
+  } catch (const std::exception& e) {
+    std::cerr << "Exception: " << e.what() << std::endl;
+    return 1;
+  }
+
+  thread.join();
+  return 0;
 }
