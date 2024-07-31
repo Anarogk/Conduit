@@ -1,22 +1,62 @@
 
-## AsyncIO Streamer
+## Project Overview
 
 ### Description
-**AsyncIO Streamer** is a C++ application that leverages the power of Boost.Asio to establish high-performance, asynchronous TCP connections. By deftly managing data flow and employing non-blocking operations, it facilitates efficient communication with remote servers. This project serves as a robust foundation for constructing sophisticated network applications that demand rapid data exchange.
+This application is designed to simulate multiple concurrent clients to test the performance of a server under load. It measures response times, and error rates, and provides performance metrics.
 
-### Technologies
-* **C++:**
-* **Boost.Asio:** A cross-platform C++ library for network and low-level I/O programming.
+### Functionality
 
-### Features
-* **Asynchronous Data Transfer:** Enables non-blocking data transmission and reception.
-* **Flexible Buffer Management:** Adapts to varying data sizes and formats.
-* **HTTP Support:** Demonstrates basic HTTP request and response handling.
-* **Error Handling:** Incorporates error detection and reporting mechanisms.
+* **Client Simulation:**
+  * Simulates multiple concurrent clients sending HTTP requests to a specified target server.
+  * Distributes client load across multiple threads for optimal performance.
+  * Handles asynchronous connections for efficient resource utilization.
 
-### Prerequisites
-* A C++ compiler with support for C++11 or later.
-* Boost.Asio library installed.
+* **Performance Metrics:**
+  * Calculates and displays key performance indicators (KPIs) such as:
+    * Total number of requests
+    * Number of successful requests
+    * Number of failed requests
+    * Average response time
+    * Error rates
+  * Provides detailed statistics for each client thread.
+
+* **Error Handling:**
+  * Implements robust error handling for network connections, HTTP requests, and response parsing.
+  * Logs errors for debugging and analysis.
+
+* **Load Control:**
+  * Offers options to control the load profile, including:
+    * Ramp-up period
+    * Steady-state period
+    * Ramp-down period
+    * Number of concurrent clients
+
+* **Response Handling:**
+  * Parses HTTP responses to extract relevant information (e.g., status code, content length).
+  * Can be customized to handle different response formats (e.g., JSON, XML).
+
+### Usage
+1. **Configure:**
+   * Set the target server's host and port.
+   * Define the number of concurrent clients.
+   * Specify load control parameters (optional).
+2. **Run:**
+   * Execute the application.
+   * The application will simulate clients, send requests, and collect performance metrics.
+3. **Analyze:**
+   * Review the generated performance report.
+   * Identify potential bottlenecks or performance issues.
+
+### Dependencies
+* Asio C++ library for network programming
+* Boost for additional utilities (optional)
+* Standard C++ libraries
+
+### Known Issues
+* List any known limitations or bugs.
+
+### Future Improvements
+* Outline potential enhancements or features for future development.
 
 ### Installation
 1. **Clone the repository:**
@@ -41,9 +81,6 @@
    ```bash
    ./async_streamer
    ```
-
-### Usage
-The application connects to the specified server (default: "xx.xx.xx.yy" on port 80) and sends an HTTP GET request. It then receives and processes the response.
 
 ### Disclaimer
 This code is provided as a learning resource and demonstration. It may not be suitable for production environments without additional enhancements. The code does not guarantee error-free or secure operation. Use it at your own risk.
