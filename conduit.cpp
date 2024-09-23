@@ -68,7 +68,7 @@ int main()
 	{
 		std::cout << "failed to connect to address"<<ec.message() << "\n";
 	}
-
+	// added this for =just a quick check
 	// check if socket is open
 	if (socket.is_open())
 	{	
